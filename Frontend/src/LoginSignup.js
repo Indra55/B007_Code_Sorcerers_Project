@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./App.css";
+import "./LoginSignup.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGooglePlusG, faFacebookF, faGithub, faLinkedinIn } from "@fortawesome/free-brands-svg-icons";
 
