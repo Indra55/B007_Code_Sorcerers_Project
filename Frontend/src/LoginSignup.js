@@ -3,7 +3,7 @@ import axios from "axios";
 import "./App.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGooglePlusG, faFacebookF, faGithub, faLinkedinIn } from "@fortawesome/free-brands-svg-icons";
-import bgVideo from "./bg.mp4";
+
 
 function LoginSignup() {
   const [isActive, setIsActive] = useState(false);
@@ -38,10 +38,6 @@ function LoginSignup() {
 
   return (
     <div className="app">
-      <video className="background-video" autoPlay loop muted preload="auto">
-        <source src={bgVideo} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
       <div className={`container ${isActive ? "active" : ""}`} id="container">
         {/* Sign Up Form */}
         <div className="form-container sign-up">
