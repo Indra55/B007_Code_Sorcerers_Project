@@ -7,7 +7,7 @@ function App() {
 
   return (
     <>
-      <LoginSignup />
+      {/* <LoginSignup /> */}
       <Home></Home>
     </>
   );

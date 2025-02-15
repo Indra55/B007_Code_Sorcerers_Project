@@ -3,12 +3,15 @@ import React from 'react';
 
 function CTA() {
   return (
-    <section className="cta bg-blue-500 text-white py-16 text-center">
-      <h2 className="text-3xl font-semibold mb-6">Ready to experience the future?</h2>
-      <button className="bg-green-500 py-2 px-6 rounded-lg text-white hover:bg-green-600">
-        Get Started
-      </button>
-    </section>
+      <section>
+        <div className='flex relative m-5'>
+          <div className='flex top-0'>
+            <button className='hover:scale-105 p-3 m-2 gap-3 bg-slate-100  rounded-lg shadow-md transition-all duration-300'>Effieciency</button>
+
+          </div>
+
+        </div>
+      </section>
   );
 }
 

@@ -55,11 +55,13 @@ const contactLinks = [
   { label: "Location", url: "/location", external: false },
 ];
   return (
-    <div>
+    <div className="pt-[120px]">
       <Navbar links={links} brandName={name} onGetStarted={handleGetStarted}/>
+      <section className="mt-96">
       <Hero></Hero>
-      <Features></Features>
+      {/* <div><Features></Features></div> */}
       <CTA></CTA>
+      </section>
       <Footer aboutLinks={aboutLinks} contactLinks={contactLinks} links={socialLinks} tagline="TAGLINE HERE PLEASE !!" title={name} />
     </div>
   );
