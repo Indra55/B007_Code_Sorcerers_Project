@@ -49,7 +49,7 @@ const Ideation = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 to-indigo-950 p-4 flex items-center justify-center">
+    <div className="min-h-screen  p-4 flex items-center justify-center">
       <div className="w-full max-w-lg border border-slate-800 rounded-lg bg-slate-950/50 backdrop-blur-sm p-6">
         <div className="space-y-4">
           <div className="flex justify-between items-center px-4">
