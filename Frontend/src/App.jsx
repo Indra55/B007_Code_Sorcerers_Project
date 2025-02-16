@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Home from "./pages/home"; // Importing the Home component
-import LoginSignup from "./components/LoginSignup";
 import Ideation from "./pages/Ideation";
 
 function App() {
@@ -8,9 +7,7 @@ function App() {
 
   return (
     <div className="">
-      {/* <LoginSignup /> */}
-      {/* <Home></Home> */}
-      <Ideation></Ideation>
+       <Home></Home> 
     </div>
   );
 }
