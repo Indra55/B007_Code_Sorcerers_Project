@@ -1,15 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import ChatBot from "./pages/ChatBot";
+import { Routes, Route } from "react-router-dom"; // Import Routes and Route
+import Home from "./pages/Home"; // Import Home component
+import ChatBot from "./pages/ChatBot"; // Import ChatBot component
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/BOT" element={<ChatBot />} />
-      </Routes>
-    </Router>
+    <Routes>
+      {/* Define routes for different components */}
+      <Route path="/" element={<Home />} />
+      <Route path="/BOT" element={<ChatBot />} />
+    </Routes>
   );
 }
 

@@ -45,7 +45,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
             </div>
           </div>
           <div className="hidden md:block">
-            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white" onClick={navigate("/BOT")}>Start Your Journey</Button>
+            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => navigate("/BOT")}>Start Your Journey</Button>
           </div>
           <div className="md:hidden">
             <button
