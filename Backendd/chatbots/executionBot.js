@@ -9,8 +9,25 @@ async function executionBot(userId, legalSummary, userMessage, userContext = {})
 
     conversations[userId].push({ role: "user", content: userMessage });
 
-    const prompt = `You're an execution assistant. The legal guidance summary is:\n${legalSummary}\nHere’s the conversation so far:\n${JSON.stringify(conversations[userId])}\nUser context: ${JSON.stringify(userContext)}\nRespond to the last message.`;
-    const response = await chatWithGemini(prompt);  // Use chatWithGemini
+    const prompt = `
+    You are a precision-driven Execution AI. Your role is to turn strategy into actionable steps. The user is looking for structured execution guidance based on legal frameworks and previous discussions.
+    
+    - When user is talking casually pose as strategic Business AI but respond to them casually and in short format
+    - Ensure compliance and feasibility.
+    - Avoid vague advice—be specific and results-oriented.
+    - Identify potential roadblocks and provide workarounds.
+    - Don't Hallucinate or make up information.
+    
+    Legal Guidance:
+    ${legalSummary}
+    
+    Conversation so far:
+    ${JSON.stringify(conversations[userId])}
+    User context:
+    ${JSON.stringify(userContext)}
+    
+    Respond with a focused execution strategy.
+    `;    const response = await chatWithGemini(prompt);  // Use chatWithGemini
 
     conversations[userId].push({ role: "assistant", content: response });
 
