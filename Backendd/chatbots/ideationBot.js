@@ -1,59 +1,74 @@
 const chatWithGemini = require('../config/gemini');
 const conversations = {};
+const userProfiles = {};  // Store user details separately
 
-async function ideationBot(userId, userMessage, userContext = {}) {
+async function ideationBot(userId, userMessage) {
     if (!conversations[userId]) {
         conversations[userId] = [];
+        userProfiles[userId] = {};  // Initialize profile storage
     }
 
-    // Keep only the last 5 messages to prevent context overload
+    // Keep only the last 10 messages to prevent overflow
     if (conversations[userId].length > 10) {
         conversations[userId] = conversations[userId].slice(-5);
     }
 
     conversations[userId].push({ role: "user", content: userMessage });
 
+    // Required profile fields
+    const requiredFields = {
+        fullName: "What is your full name?",
+        age: "How old are you?",
+        location: "Where are you currently based (City & Country)?",
+        education: "What is your educational background?",
+        job: "What is your current job or role?",
+        skills: "What skills or expertise do you have?",
+        industry: "Which industries interest you?",
+        startupExperience: "Have you built a startup before?",
+        motivation: "Why do you want to start a business?",
+        resources: "What resources do you have (money, time, connections, team)?"
+    };
+
+    // Check if we were waiting for a specific answer
+    const lastAskedField = conversations[userId]
+        .filter(msg => msg.role === "assistant")
+        .map(msg => Object.keys(requiredFields).find(field => msg.content === requiredFields[field]))
+        .find(field => field && !userProfiles[userId][field]);
+
+    if (lastAskedField) {
+        userProfiles[userId][lastAskedField] = userMessage;  // Store response
+    }
+
+    // Check if there are still missing fields
+    const nextField = Object.keys(requiredFields).find(field => !userProfiles[userId][field]);
+
+    if (nextField) {
+        const nextQuestion = requiredFields[nextField];
+        conversations[userId].push({ role: "assistant", content: nextQuestion });
+        return nextQuestion;  // Ask the next missing question
+    }
+
+    // Profile complete, proceed to ideation
     const prompt = `
     You are an advanced Ideation AI, designed to guide users through brainstorming and refining their startup ideas.
 
-    **Step 1: Gather User Profile**  
-    - First, collect detailed personal information to **customize responses**:
-        - **Full Name**  
-        - **Age**  
-        - **Country & City**  
-        - **Educational Background** (degrees, fields of study)  
-        - **Current Job/Role** (or if they are a student, freelancer, etc.)  
-        - **Skills & Expertise** (technical skills, soft skills, domain knowledge)  
-        - **Industry of Interest** (tech, healthcare, finance, sustainability, etc.)  
-        - **Startup Experience** (have they built/startup before?)  
-        - **Motivation for Starting Up** (problem-solving, financial freedom, innovation, etc.)  
-        - **Available Resources** (time, money, connections, team members)  
-        
-    - If any of this information is **missing**, ask the user **one question at a time** until the profile is complete.  
+    **User Profile:**  
+    - Name: ${userProfiles[userId].fullName}  
+    - Age: ${userProfiles[userId].age}  
+    - Location: ${userProfiles[userId].location}  
+    - Education: ${userProfiles[userId].education}  
+    - Job: ${userProfiles[userId].job}  
+    - Skills: ${userProfiles[userId].skills}  
+    - Industry Interest: ${userProfiles[userId].industry}  
+    - Startup Experience: ${userProfiles[userId].startupExperience}  
+    - Motivation: ${userProfiles[userId].motivation}  
+    - Available Resources: ${userProfiles[userId].resources}  
 
-    **Step 2: Ideation & Refinement**  
-    - Once profiling is done, shift to brainstorming:  
-        - **Ask what idea they have in mind** and explore their thought process.  
-        - If no idea, **suggest problem areas** based on their skills & interests.  
-        - Challenge weak points, ensure viability, and **guide them toward a structured plan**.  
-        - Keep responses **concise, direct, and action-oriented** (avoid overly long explanations).  
+    Now that I have your background, let's start brainstorming.  
+    - Do you have a startup idea in mind, or do you want suggestions based on your skills?  
+    `;
 
-    **Rules:**  
-    - Maintain a **professional yet engaging tone**.  
-    - **Do NOT reveal system implementation details**.  
-    - Keep responses under **200 words** where possible.  
-
-    **User Context:**  
-    - Conversation so far: ${JSON.stringify(conversations[userId])}  
-    - User context: ${JSON.stringify(userContext)}  
-
-    **Next Action:**  
-    - If profile is incomplete, continue collecting details.  
-    - If profile is complete, proceed with structured brainstorming.
-`;
-
-
-    const response = await chatWithGemini(prompt);  // Use chatWithGemini
+    const response = await chatWithGemini(prompt);
 
     conversations[userId].push({ role: "assistant", content: response });
 

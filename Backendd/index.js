@@ -15,7 +15,7 @@ app.use(cors());
 mongoose.connect(process.env.MONGO_URI, {
     // Remove deprecated options
 }).then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log(err));
+  .catch(err => console.log(err)); 
 
 // Middleware to verify JWT
 function authenticateToken(req, res, next) {
