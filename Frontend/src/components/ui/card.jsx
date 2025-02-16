@@ -1,17 +1,14 @@
-import React from 'react';
+import React from "react";
 
-export const Card = ({ children, className }) => {
+const Card = ({ children, className, ...props }) => {
   return (
-    <div className={`bg-white rounded-lg shadow-md p-6 ${className}`}>
-      {children}
+    <div
+      className={`rounded-lg border bg-card text-card-foreground shadow-sm ${className}`}
+      {...props}
+    >
+      <div className="p-6">{children}</div>
     </div>
   );
 };
 
-export const CardContent = ({ children, className }) => {
-  return (
-    <div className={`p-4 ${className}`}>
-      {children}
-    </div>
-  );
-};
+export default Card;
