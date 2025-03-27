@@ -53,7 +53,7 @@ const ChatBot = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2IxNzE1YTE5ZDViNWY4ZTEzMjgyZjYiLCJpYXQiOjE3Mzk2ODIxNDcsImV4cCI6MTczOTY4NTc0N30.1dLvMfMfDvtx2FwIZ__ACZ4lljEq3SQJTNmsBuUq5uU'
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2U1MzgxMTBmMjhiZDQxMGM4NmI0MjkiLCJpYXQiOjE3NDMwNzUzNjIsImV4cCI6MTc0MzA3ODk2Mn0.7Jr-SdLLqLuNRHxXMGuPhTc0edyi22ClqSyXeKGmA3g'
         },
         body: JSON.stringify({ message: inputMessage, stage: currentBot })
       });
@@ -97,7 +97,7 @@ const ChatBot = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2IxNzE1YTE5ZDViNWY4ZTEzMjgyZjYiLCJpYXQiOjE3Mzk2ODIxNDcsImV4cCI6MTczOTY4NTc0N30.1dLvMfMfDvtx2FwIZ__ACZ4lljEq3SQJTNmsBuUq5uU'
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2U1MzgxMTBmMjhiZDQxMGM4NmI0MjkiLCJpYXQiOjE3NDMwNzUzNjIsImV4cCI6MTc0MzA3ODk2Mn0.7Jr-SdLLqLuNRHxXMGuPhTc0edyi22ClqSyXeKGmA3g'
         },
         body: JSON.stringify({ message: "Generate final report", stage: currentBot, userContext: {} })
       });
@@ -219,7 +219,7 @@ const ChatBot = () => {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-900/50">
           {currentStageId === 'final-report' ? (
             // Final Report stage: centered markdown response.
             <div className="flex-1 flex flex-col justify-center items-center p-6">
@@ -257,7 +257,25 @@ const ChatBot = () => {
                       <div className={`rounded-2xl p-3 shadow-lg backdrop-blur-md ${
                         message.isBot ? 'bg-gray-700/60 border border-gray-700' : 'bg-indigo-600/60 border border-indigo-600'
                       } text-white`}>
-                        <p className="text-sm">{message.text}</p>
+                        <ReactMarkdown 
+                          className="text-sm prose prose-invert max-w-none"
+                          components={{
+                            p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                            ul: ({ children }) => <ul className="list-disc pl-4 mb-2">{children}</ul>,
+                            ol: ({ children }) => <ol className="list-decimal pl-4 mb-2">{children}</ol>,
+                            li: ({ children }) => <li className="mb-1">{children}</li>,
+                            code: ({ inline, children }) => 
+                              inline ? (
+                                <code className="bg-gray-800 px-1 rounded">{children}</code>
+                              ) : (
+                                <pre className="bg-gray-800 p-2 rounded overflow-x-auto">
+                                  <code>{children}</code>
+                                </pre>
+                              )
+                          }}
+                        >
+                          {message.text}
+                        </ReactMarkdown>
                       </div>
                       {!message.isBot && (
                         <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">

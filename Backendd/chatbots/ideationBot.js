@@ -1,14 +1,16 @@
 const chatWithGemini = require('../config/gemini');
 const conversations = {};
 const userProfiles = {};  // Store user details separately
+const userStates = {};    // Track conversation state
 
 async function ideationBot(userId, userMessage) {
     if (!conversations[userId]) {
         conversations[userId] = [];
-        userProfiles[userId] = {};  // Initialize profile storage
+        userProfiles[userId] = {};
+        userStates[userId] = 'collecting_profile'; // Initial state
     }
 
-    // Keep only the last 10 messages to prevent overflow
+    // Keep only the last 10 messages
     if (conversations[userId].length > 10) {
         conversations[userId] = conversations[userId].slice(-5);
     }
@@ -29,50 +31,54 @@ async function ideationBot(userId, userMessage) {
         resources: "What resources do you have (money, time, connections, team)?"
     };
 
-    // Check if we were waiting for a specific answer
-    const lastAskedField = conversations[userId]
-        .filter(msg => msg.role === "assistant")
-        .map(msg => Object.keys(requiredFields).find(field => msg.content === requiredFields[field]))
-        .find(field => field && !userProfiles[userId][field]);
+    if (userStates[userId] === 'collecting_profile') {
+        // Check if we were waiting for a specific answer
+        const lastAskedField = conversations[userId]
+            .filter(msg => msg.role === "assistant")
+            .map(msg => Object.keys(requiredFields).find(field => msg.content === requiredFields[field]))
+            .find(field => field && !userProfiles[userId][field]);
 
-    if (lastAskedField) {
-        userProfiles[userId][lastAskedField] = userMessage;  // Store response
+        if (lastAskedField) {
+            userProfiles[userId][lastAskedField] = userMessage;
+        }
+
+        // Check if there are still missing fields
+        const nextField = Object.keys(requiredFields).find(field => !userProfiles[userId][field]);
+
+        if (nextField) {
+            const nextQuestion = requiredFields[nextField];
+            conversations[userId].push({ role: "assistant", content: nextQuestion });
+            return nextQuestion;
+        } else {
+            // All profile fields are collected, move to ideation state
+            userStates[userId] = 'ideation';
+            const initiateIdeation = "Great! Now that I know about you, do you have a specific startup idea in mind? If yes, please describe it. If not, I can help you brainstorm based on your background and interests.";
+            conversations[userId].push({ role: "assistant", content: initiateIdeation });
+            return initiateIdeation;
+        }
     }
 
-    // Check if there are still missing fields
-    const nextField = Object.keys(requiredFields).find(field => !userProfiles[userId][field]);
+    // If we're in ideation state, handle the conversation
+    if (userStates[userId] === 'ideation') {
+        const prompt = `
+        You are an advanced Ideation AI, continuing a conversation about startup ideas.
+        
+        Context about the user:
+        ${Object.entries(userProfiles[userId]).map(([key, value]) => `${key}: ${value}`).join('\n')}
+        
+        Previous messages:
+        ${conversations[userId].slice(-3).map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+        
+        Based on their profile and the conversation so far, provide relevant guidance about their startup idea or help them develop one.
+        Be concise and actionable in your response.
+        If they haven't shared an idea yet, help them brainstorm based on their skills and interests.
+        If they have shared an idea, help them refine it and consider key aspects they might have missed.
+        `;
 
-    if (nextField) {
-        const nextQuestion = requiredFields[nextField];
-        conversations[userId].push({ role: "assistant", content: nextQuestion });
-        return nextQuestion;  // Ask the next missing question
+        const response = await chatWithGemini(prompt);
+        conversations[userId].push({ role: "assistant", content: response });
+        return response;
     }
-
-    // Profile complete, proceed to ideation
-    const prompt = `
-    You are an advanced Ideation AI, designed to guide users through brainstorming and refining their startup ideas.
-
-    **User Profile:**  
-    - Name: ${userProfiles[userId].fullName}  
-    - Age: ${userProfiles[userId].age}  
-    - Location: ${userProfiles[userId].location}  
-    - Education: ${userProfiles[userId].education}  
-    - Job: ${userProfiles[userId].job}  
-    - Skills: ${userProfiles[userId].skills}  
-    - Industry Interest: ${userProfiles[userId].industry}  
-    - Startup Experience: ${userProfiles[userId].startupExperience}  
-    - Motivation: ${userProfiles[userId].motivation}  
-    - Available Resources: ${userProfiles[userId].resources}  
-
-    Now that I have your background, let's start brainstorming.  
-    - Do you have a startup idea in mind, or do you want suggestions based on your skills?  
-    `;
-
-    const response = await chatWithGemini(prompt);
-
-    conversations[userId].push({ role: "assistant", content: response });
-
-    return response;
 }
 
 module.exports = ideationBot;
